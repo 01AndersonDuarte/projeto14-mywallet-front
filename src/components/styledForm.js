@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 export const StyledForm = styled.form`
     width: 100%;
@@ -38,5 +39,32 @@ export const StyledForm = styled.form`
         cursor: pointer;
         display: flex;
         justify-content: center;
+    }
+`;
+
+export const LinkN = styled(Link)`
+    text-decoration: none;
+`;
+
+export const Container = styled.div`
+    width: 100%;
+    padding: 10%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    p{
+        font-family: 'Saira Stencil One';
+        color: #FFFFFF;
+        font-weight: 400;
+        font-size: 32px;
+        margin-bottom: 10%;
+    }
+    h2{
+        font-family: 'Raleway';
+        font-size: 15px;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin-top: 5%;
     }
 `;

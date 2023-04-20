@@ -8,7 +8,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route parth="/cadastro" element={<RegisterPage />} />
+        <Route path="/cadastro" element={<RegisterPage />} />
       </Routes>
     </BrowserRouter>
   );
