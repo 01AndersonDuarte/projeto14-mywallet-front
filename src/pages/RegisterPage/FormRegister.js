@@ -9,6 +9,8 @@ export default function FormRegister() {
     function registerRequest(event){
         event.preventDefault();
         setRequest(true);
+
+        const url = process.env.SIGN_UP_URL;
         // Requisição aqui
 
     }

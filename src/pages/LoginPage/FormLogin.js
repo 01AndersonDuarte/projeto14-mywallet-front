@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { StyledForm } from "../../components/styledForm";
 import { Loading } from "../../components/Loading";
+import axios from "axios";
 
 export default function FormLogin() {
     const [loginData, setLoginData] = useState({ email: "", password: "" })
@@ -16,7 +17,16 @@ export default function FormLogin() {
     function loginRequest(event) {
         event.preventDefault();
         setRequest(true);
-        //Requisição aqui
+
+        const url = process.env.SIGN_IN_URL;
+
+        axios.post(url, loginData).then((response) => {
+            setRequest(false);
+            console.log(response);
+        }).catch((error) => {
+            setRequest(false);
+            alert(error.response.data);
+        });
     }
     return (
         <StyledForm onSubmit={loginRequest}>
