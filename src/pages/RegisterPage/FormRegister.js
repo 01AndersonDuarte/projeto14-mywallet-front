@@ -1,18 +1,40 @@
 import { useState } from "react";
 import { StyledForm } from "../../components/styledForm";
 import { Loading } from "../../components/Loading";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function FormRegister() {
     const [registrationData, setRegistrationData] = useState({ name: "", email: "", password: "", passwordConfirm: "" });
     const [request, setRequest] = useState(false);
+    const navigate = useNavigate();
 
-    function registerRequest(event){
+    async function registerRequest(event) {
         event.preventDefault();
         setRequest(true);
 
-        const url = process.env.SIGN_UP_URL;
-        // Requisição aqui
+        const url = process.env.REACT_APP_SIGN_UP_URL;
+        const { passwordConfirm, ...register } = registrationData;
 
+        if (registrationData.password !== registrationData.passwordConfirm) {
+            setRequest(false);
+            return alert("Senhas diferentes");
+        }
+
+        try {
+            await axios.post(url, register);
+
+            const { name, ...loginData } = register;
+            // const loginData = {email: "asdhgs@asdasd.com", password: "123"} para testar mensagens de erro no catch
+            const urlLogin = process.env.REACT_APP_SIGN_IN_URL;
+
+            const userRegister = await axios.post(urlLogin, loginData);
+            navigate("/home");
+
+        } catch (error) {
+            setRequest(false);
+            alert(error.response.data);
+        }
     }
 
     function insertRegistrationData(event) {

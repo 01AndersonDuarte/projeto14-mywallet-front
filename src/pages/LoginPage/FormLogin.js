@@ -2,10 +2,12 @@ import { useState } from "react";
 import { StyledForm } from "../../components/styledForm";
 import { Loading } from "../../components/Loading";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function FormLogin() {
     const [loginData, setLoginData] = useState({ email: "", password: "" })
     const [request, setRequest] = useState(false);
+    const navigate = useNavigate();
 
     function insertLoginData(event) {
         event.target.setCustomValidity('');
@@ -18,11 +20,13 @@ export default function FormLogin() {
         event.preventDefault();
         setRequest(true);
 
-        const url = process.env.SIGN_IN_URL;
+        const url = process.env.REACT_APP_SIGN_IN_URL;
 
         axios.post(url, loginData).then((response) => {
-            setRequest(false);
-            console.log(response);
+            const objectSerial = JSON.stringify({token: response.data.token});
+            localStorage.setItem("user", objectSerial);
+            navigate("/home");
+            
         }).catch((error) => {
             setRequest(false);
             alert(error.response.data);

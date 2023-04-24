@@ -1,42 +1,101 @@
-import { useState } from "react";
-import styled from "styled-components";
-
-import { FiLogOut } from "react-icons/fi";
-import { IoMdAddCircleOutline, IoMdRemoveCircleOutline } from "react-icons/io";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import axios from "axios";
+
+import { LoadingLines } from "../../components/Loading";
+import { LogOffIcon, AddIcon, RemoveIcon } from "./iconsStyle";
+import Operations from "./Operations";
 
 export default function HomePage() {
-    const [userName, setUserName] = useState('Anderson');
+    const [userActive, setUserActive] = useState(null);
+    const [userTransactions, setUserTransactions] = useState([]);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = JSON.parse(localStorage.getItem("user"));
+        const config = { headers: { Authorization: `Bearer ${token.token}` } };
+
+        const url = process.env.REACT_APP_GET_TRANSACTIONS;
+
+        axios.get(url, config).then((response) => {
+            const transactions = [];
+            let over = 0;
+
+            response.data.transactions.inflow.map((t) => {
+                transactions.push({ type: 'Entrada', ...t });
+                over += parseFloat(t.value);
+            });
+            response.data.transactions.outflow.map((t) => {
+                transactions.push({ type: 'Saída', ...t });
+                over -= parseFloat(t.value);
+            });
+            setUserActive({ name: response.data.name, over: parseFloat(over).toFixed(2), transactions });
+        }).catch((error) => {
+            alert(error.response.data);
+        });
+    }, []);
+
+    if (!userActive) {
+        return (
+            <ContainerHome>
+                <LoadingLines />
+            </ContainerHome>
+        );
+    }
 
     return (
         <ContainerHome>
             <header>
-                <h1>Olá, {userName} </h1>
+                <h1>Olá, {userActive.name} </h1>
                 <LogOffIcon />
             </header>
             <main>
-                <p>
-                    Não há registros de
-                    entrada ou saída
-                </p>
+                {userActive.transactions === [] ?
+                    <p>
+                        Não há registros de
+                        entrada ou saída
+                    </p>
+                    :
+                    <>
+                        <Operations transactions={userActive.transactions} />
+                        <FooterOperations value={userActive.over}>
+                            <h1>SALDO</h1>
+                            <h2>{userActive.over}</h2>
+                        </FooterOperations>
+                    </>
+                }
             </main>
             <footer>
-                <button onClick={()=>navigate("/nova-transacao/entrada")}>
+                <button onClick={() => navigate("/nova-transacao/entrada")}>
                     <AddIcon />
                     <h3>Nova entrada</h3>
                 </button>
-                <button onClick={()=>navigate("/nova-transacao/saída")}>
+                <button onClick={() => navigate("/nova-transacao/saída")}>
                     <RemoveIcon />
                     <h3>Nova saída</h3>
                 </button>
             </footer>
-        </ContainerHome>
+        </ContainerHome >
     );
 }
+const FooterOperations = styled.footer`
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    bottom: 0;
+    left: 0;
 
+    padding: 3%;
+    h1{
+        color: #000000;
+    }
+    h2{
+        color: ${({ value }) => value > 0 ? '#03AC00' : '#C70000'};
+    }
+
+`;
 const ContainerHome = styled.div`
-    width: 100%;
     padding: 5%;
     font-family: 'Raleway';
 
@@ -52,22 +111,19 @@ const ContainerHome = styled.div`
             line-height: 31px;
         }
     }
-    
+
     main{
         height: 65vh;
-        padding: 10%;
+        padding: 5% 1.5% 0% 1.5%;
         background-color: #FFFFFF;
         color: #868686;
         font-weight: 400;
         border-radius: 5px;
         margin-bottom: 5%;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
         text-align: center;
+        position: relative;
     }
-    
+
     footer{
         width: 100%;
         display: flex;
@@ -85,23 +141,4 @@ const ContainerHome = styled.div`
             border-radius: 5px;
         }
     }
-`;
-const LogOffIcon = styled(FiLogOut)`
-     font-size: 25px;
-     color: #FFFFFF;
-     /* position: absolute;
-     right: 5%;
-     top: 8%; */
-     cursor: pointer;
-
-`;
-const AddIcon = styled(IoMdAddCircleOutline)`
-    font-size: 25px;
-    color: #FFFFFF;
-    cursor: pointer;
-`;
-const RemoveIcon = styled(IoMdRemoveCircleOutline)`
-    font-size: 25px;
-    color: #FFFFFF;
-    cursor: pointer;
 `;
