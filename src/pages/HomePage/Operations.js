@@ -36,7 +36,7 @@ const DivOperation = styled.div`
         margin-right: 5px;
     }
     h3{
-        color: ${({ type }) => type === 'Entrada' ? '#03AC00' : '#C70000'};
+        color: ${({ type }) => type === 'inflow' ? '#03AC00' : '#C70000'};
         margin-left: auto;
     }
 `;

@@ -14,7 +14,7 @@ export default function HomePage() {
 
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem("user"));
-        if(!token) return navigate('/');
+        if (!token) return navigate('/');
         const config = { headers: { Authorization: `Bearer ${token.token}` } };
 
         const url = process.env.REACT_APP_GET_TRANSACTIONS;
@@ -22,23 +22,27 @@ export default function HomePage() {
         axios.get(url, config).then((response) => {
             const transactions = [];
             let over = 0;
+            console.log(response);
 
-            response.data.transactions.inflow.map((t) => {
-                transactions.push({ type: 'Entrada', ...t });
-                over += parseFloat(t.value);
+            response.data.transactions.map((t) => {
+                if (t.type === 'inflow') {
+                    over += parseFloat(t.value);
+                } else {
+                    over -= parseFloat(t.value);
+                };
             });
-            response.data.transactions.outflow.map((t) => {
-                transactions.push({ type: 'Saída', ...t });
-                over -= parseFloat(t.value);
-            });
+            // response.data.transactions.outflow.map((t) => {
+            //     transactions.push({ type: 'Saída', ...t });
+            //     over -= parseFloat(t.value);
+            // });
 
-            const transactionsArray = transactions.sort((a, b) => {
-                const dataA = new Date(`2023/${a.date.split('/').reverse().join('/')}`);
-                const dataB = new Date(`2023/${b.date.split('/').reverse().join('/')}`);
-                return dataA - dataB;
-            });
+            // const transactionsArray = transactions.sort((a, b) => {
+            //     const dataA = new Date(`2023/${a.date.split('/').reverse().join('/')}`);
+            //     const dataB = new Date(`2023/${b.date.split('/').reverse().join('/')}`);
+            //     return dataA - dataB;
+            // });
 
-            setUserActive({ name: response.data.name, over: parseFloat(over).toFixed(2), transactions: transactionsArray.reverse() });
+            setUserActive({ over: parseFloat(over).toFixed(2), ...response.data});
         }).catch((error) => {
             alert(error);
         });
@@ -56,7 +60,7 @@ export default function HomePage() {
         <ContainerHome>
             <header>
                 <h1>Olá, {userActive.name} </h1>
-                <LogOffIcon onClick={()=>navigate('/')}/>
+                <LogOffIcon onClick={() => navigate('/')} />
             </header>
             <main>
                 {userActive.transactions === [] ?
