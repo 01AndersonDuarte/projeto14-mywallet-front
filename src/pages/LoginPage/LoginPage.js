@@ -1,7 +1,12 @@
 import FormLogin from "./FormLogin";
 import { LinkN, Container } from "../../components/styledForm";
+import { useEffect } from "react";
 
 export default function LoginPage() {
+
+    useEffect(()=>{
+        localStorage.removeItem("user");
+    }, [])
 
     return (
         <Container>

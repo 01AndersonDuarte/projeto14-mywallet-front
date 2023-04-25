@@ -14,6 +14,7 @@ export default function HomePage() {
 
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem("user"));
+        if(!token) return navigate('/');
         const config = { headers: { Authorization: `Bearer ${token.token}` } };
 
         const url = process.env.REACT_APP_GET_TRANSACTIONS;
@@ -30,9 +31,16 @@ export default function HomePage() {
                 transactions.push({ type: 'Saída', ...t });
                 over -= parseFloat(t.value);
             });
-            setUserActive({ name: response.data.name, over: parseFloat(over).toFixed(2), transactions });
+
+            const transactionsArray = transactions.sort((a, b) => {
+                const dataA = new Date(`2023/${a.date.split('/').reverse().join('/')}`);
+                const dataB = new Date(`2023/${b.date.split('/').reverse().join('/')}`);
+                return dataA - dataB;
+            });
+
+            setUserActive({ name: response.data.name, over: parseFloat(over).toFixed(2), transactions: transactionsArray.reverse() });
         }).catch((error) => {
-            alert(error.response.data);
+            alert(error);
         });
     }, []);
 
@@ -48,7 +56,7 @@ export default function HomePage() {
         <ContainerHome>
             <header>
                 <h1>Olá, {userActive.name} </h1>
-                <LogOffIcon />
+                <LogOffIcon onClick={()=>navigate('/')}/>
             </header>
             <main>
                 {userActive.transactions === [] ?
