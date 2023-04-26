@@ -12,6 +12,8 @@ export default function HomePage() {
     const [userTransactions, setUserTransactions] = useState([]);
     const navigate = useNavigate();
 
+    // console.log(userActive.transactions.length);
+
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem("user"));
         if (!token) return navigate('/');
@@ -63,11 +65,13 @@ export default function HomePage() {
                 <LogOffIcon onClick={() => navigate('/')} />
             </header>
             <main>
-                {userActive.transactions === [] ?
-                    <p>
-                        Não há registros de
-                        entrada ou saída
-                    </p>
+                {userActive.transactions.length === 0 ?
+                    <span>
+                        <p>
+                            Não há registros de
+                            entrada ou saída
+                        </p>
+                    </span>
                     :
                     <>
                         <Operations transactions={userActive.transactions} />
@@ -134,6 +138,12 @@ const ContainerHome = styled.div`
         margin-bottom: 5%;
         text-align: center;
         position: relative;
+        span{
+            height: 50%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
     }
 
     footer{
